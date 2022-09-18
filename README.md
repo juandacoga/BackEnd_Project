@@ -18,3 +18,6 @@ Objetos del proyecto V1
       o API de información sobre el estado del trafico para el cálculo de la ruta
       NOTA: no se usaria google maps, se puede usar alternativa opensource
 
+Forma de instalación del proyecto
+- Debes tener instalado composer 
+- Una vez clonado el proyecto ejecutar el comando
