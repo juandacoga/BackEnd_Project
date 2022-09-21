@@ -27,6 +27,7 @@ Objetos del proyecto V1
       poner el .dll en la carpeta de php y poner "extension=php_mongo" en el php.ini
   - 
 - **DESARROLLO**
+  - Debes tener instalado composer 
   - Clonar el repositorio 
   - Crear el archivo .env
   
