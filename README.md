@@ -18,6 +18,16 @@ Objetos del proyecto V1
       o API de información sobre el estado del trafico para el cálculo de la ruta
       NOTA: no se usaria google maps, se puede usar alternativa opensource
 
-Forma de instalación del proyecto
-- Debes tener instalado composer 
-- Una vez clonado el proyecto ejecutar el comando
+**Pasos para instalar el proyecto**
+- **DB**
+  - Debes tener instalado MongoDB y haber agregado la extensión(DLL) de MongoDB a php
+    - **RECURSOS** (para windows)
+      https://www.php.net/manual/es/mongodb.installation.windows.php
+      https://pecl.php.net/package/mongodb (descargar la versión compatible con php, el proyecto usa php 8.1)
+      poner el .dll en la carpeta de php y poner "extension=php_mongo" en el php.ini
+  - 
+- **DESARROLLO**
+  - Debes tener instalado composer 
+  - Clonar el repositorio 
+  - Crear el archivo .env
+  
