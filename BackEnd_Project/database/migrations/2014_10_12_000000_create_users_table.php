@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::create('user__manager', function (Blueprint $table) {
             $table->string('name');
             $table->integer('type_user');
-            $table->unique('email');
+            $table->string('email')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->integer('state');
+            $table->integer('state')->comment('0-inactivo; 1-activo; 2-pendiente');
             $table->integer('first_login');
             $table->rememberToken();
             $table->timestamps();
