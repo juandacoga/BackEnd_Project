@@ -32,7 +32,14 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-        return response()->json([
+        if($user->state==0 || $user->state==2){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+        else {
+            return response()->json([
             'user' => $user,
             'status' => 'success',
             'authorisation' => [
@@ -40,6 +47,8 @@ class AuthController extends Controller
                 'type' => 'bearer',
                 ]
             ]);
+        }
+        
 
     }
 
@@ -49,7 +58,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:user__manager',
             'password' => 'required|string|min:6',
             'type_user'=>'required|integer',
-            'state'=>'required|integer',
+            //'state'=>'required|integer',
         ]);
 
         $user = User::create([
@@ -57,7 +66,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'type_user'=>$request->type_user,
-            'state'=>$request->state,
+            'state'=>2,
             'first_login'=>1,
             'confirm_email'=>0
         ]);

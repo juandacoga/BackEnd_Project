@@ -24,4 +24,4 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/refresh', 'refresh');
 
 });
-Route::post('/prueba', function(){echo 'hola mundo';});
+//Route::post('/prueba', function(){echo 'hola mundo';});
