@@ -20,14 +20,26 @@ Objetos del proyecto V1
 
 **Pasos para instalar el proyecto**
 - **DB**
-  - Debes tener instalado MongoDB y haber agregado la extensión(DLL) de MongoDB a php
+  - Debes tener instalado MongoDB 
+  - instalar PHP 8.1 (ponerlo en variable de entorno si es necesario)
+  - instalar Composer (Es el gestor de paquetes de PHP similar a "npm")
+  - instalar la extension de PHP para mongodb [link de la extension](https://pecl.php.net/package/mongodb/1.13.0/windows)
     - **RECURSOS** (para windows)
       https://www.php.net/manual/es/mongodb.installation.windows.php
       https://pecl.php.net/package/mongodb (descargar la versión compatible con php, el proyecto usa php 8.1)
-      poner el .dll en la carpeta de php y poner "extension=php_mongo" en el php.ini
-  - 
+      poner los 2 archivos mongo en la carpeta de PHP/ext  y poner "extension=mongodb" en el php.ini
+    - link de guia con imagenes: [word de instalacion](https://docs.google.com/document/d/1ZORqV0BXAzhh3IARKrQO0z-6QFk_kyTTMtQ0KUaDg8Q/edit?usp=sharing)
+
+
 - **DESARROLLO**
-  - Debes tener instalado composer 
-  - Clonar el repositorio 
-  - Crear el archivo .env
+  - Clonar el repositorio rama develop o la que necesite 
+  - Debes tener instalado composer y ejecutar el comando:
+  >composer install
+  - Copiar .env.example y crear el archivo .env
+  - Migrar las tablas a la base de datos:
+  >php artisan migrate 
+  - inicializar el JWT:
+  >php artisan jwt:secret 
+  - correr el servidor:
+  >php artisan serve
   
