@@ -17,11 +17,6 @@ use Illuminate\Support\Carbon;
 class AuthController extends Controller
 {
 
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:api', ['except' => ['login', 'register']]);
-    // }
-
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -72,14 +67,37 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'state' => 2,
             'first_login' => 1,
-            // 'confirm_email' => 0
         ]);
+
+        $random = Str::random(40);
+        $domain = URL::to('/');
+        $url = $domain . '/verify-mail/' . $random;
+
+        $data['url'] = $url;
+        $data['email'] = $user->email;
+        $data['title'] = "Email Verification";
+        $data['body'] = "Solo da click en siguiente botón para que cada viaje sea una gran experiencia";
+        Mail::send('verifyMail', ['data' => $data], function ($message) use ($data) {
+            $message->to($data['email'])->subject($data['title']);
+        });
+
+        return $this->verificarCorreo($user->email, $random);
+    }
+
+    public function verificarCorreo($email, $random)
+    {
+        $user = User::where('email', $email)->get();
+
+        $user = User::find($user[0]['id']);
+        $user->rememberToken = $random;
+        $user->save();
 
 
         return response()->json([
-            'status' => 'success',
-            'message' => 'User created successfully',
+            'success' => true,
+            'message' => 'User created successfully!! we have sent an email to your inbox please check your email',
             'user' => $user,
+
         ]);
     }
 
@@ -104,35 +122,6 @@ class AuthController extends Controller
         ]);
     }
 
-    public function sendVerifyMail($email)
-    {
-
-        if (!auth()->user()) return response()->json(['success' => false, 'message' => 'user is not Authenticated']);
-
-        $user = User::where('email', $email)->get();
-
-        if (!count($user) > 0) {
-            return response()->json(['success' => false, 'message' => 'User is not found!']);
-        }
-
-        $random = Str::random(40);
-        $domain = URL::to('/');
-        $url = $domain . '/verify-mail/' . $random;
-
-        $data['url'] = $url;
-        $data['email'] = $email;
-        $data['title'] = "Email Verification";
-        $data['body'] = "Solo da click en siguiente botón para que cada viaje sea una gran experiencia";
-        Mail::send('verifyMail', ['data' => $data], function ($message) use ($data) {
-            $message->to($data['email'])->subject($data['title']);
-        });
-
-        $userId = User::find($user[0]['id']);
-        $userId->rememberToken = $random;
-        $userId->save();
-
-        return response()->json(['success' => true, 'message' => 'Mail send successfully ']);
-    }
 
     public function verificationMail($token)
     {
