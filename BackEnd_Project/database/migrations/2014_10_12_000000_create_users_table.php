@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('type_user');
             $table->string('email')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->integer('is_verified')->default(0);
             $table->string('password');
             $table->integer('state')->comment('0-inactivo; 1-activo; 2-pendiente');
             $table->integer('first_login');

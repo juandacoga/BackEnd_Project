@@ -7,58 +7,63 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Carbon;
 
 class AuthController extends Controller
 {
-    //
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
-    }
+
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:api', ['except' => ['login', 'register']]);
+    // }
 
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|string|email',
-            'password' => 'required|string',
+            'password' => 'required|string|min:8'
         ]);
-        $credentials = $request->only('email', 'password');
 
-        $token = Auth::attempt($credentials);
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
+        $token = auth()->attempt($validator->validate());
+
         if (!$token) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 401);
+            return response()->json(['sucess' => false, 'msg' => 'Username & password incorrect']);
         }
 
-        $user = Auth::user();
-        if ($user->state == 0 || $user->state == 2) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 401);
-        } else {
-            return response()->json([
-                'user' => $user,
-                'status' => 'success',
-                'authorisation' => [
-                    'token' => $token,
-                    'type' => 'bearer',
-                ]
-            ]);
-        }
+        return $this->respondWithToken($token);
+    }
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'success' => true,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60
+        ]);
     }
 
     public function register(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'type_user' => 'required|integer',
             'email' => 'required|string|email|max:255|unique:user__manager',
             'password' => 'required|string|min:8|regex:"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}(?=.*[@#$%^&+=]).*$"',
-            //'state'=>'required|integer',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
 
         $user = User::create([
             'name' => $request->name,
@@ -97,5 +102,53 @@ class AuthController extends Controller
                 'type' => 'bearer',
             ]
         ]);
+    }
+
+    public function sendVerifyMail($email)
+    {
+
+        if (!auth()->user()) return response()->json(['success' => false, 'message' => 'user is not Authenticated']);
+
+        $user = User::where('email', $email)->get();
+
+        if (!count($user) > 0) {
+            return response()->json(['success' => false, 'message' => 'User is not found!']);
+        }
+
+        $random = Str::random(40);
+        $domain = URL::to('/');
+        $url = $domain . '/verify-mail/' . $random;
+
+        $data['url'] = $url;
+        $data['email'] = $email;
+        $data['title'] = "Email Verification";
+        $data['body'] = "Solo da click en siguiente botón para que cada viaje sea una gran experiencia";
+        Mail::send('verifyMail', ['data' => $data], function ($message) use ($data) {
+            $message->to($data['email'])->subject($data['title']);
+        });
+
+        $userId = User::find($user[0]['id']);
+        $userId->rememberToken = $random;
+        $userId->save();
+
+        return response()->json(['success' => true, 'message' => 'Mail send successfully ']);
+    }
+
+    public function verificationMail($token)
+    {
+        $user =  User::where('rememberToken', $token)->get();
+
+        if (!count($user) > 0) {
+            return view('404');
+        }
+
+        $datetime = Carbon::now()->format('Y-m-d H:i:s');
+        $userId = User::find($user[0]['id']);
+        $userId->rememberToken = '';
+        $userId->is_verified = 1;
+        $userId->state = 1;
+        $userId->email_verified_at = $datetime;
+        $userId->save();
+        return "<h1>Email verified successfully!</h1>";
     }
 }

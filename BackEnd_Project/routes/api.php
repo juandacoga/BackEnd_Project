@@ -18,11 +18,12 @@ use App\Http\Controllers\AuthController;
     return $request->user();
 });*/
 
-Route::controller(AuthController::class)->group(function () {
-    Route::post('/login', 'login');
-    Route::post('/register', 'register');
-    Route::post('/logout', 'logout');
-    Route::post('/refresh', 'refresh');
+Route::group(['middleware' => 'api'], function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/send-verify-email/{email}', [AuthController::class, 'sendVerifyMail']);
+    // Route::post('/logout', 'logout');
+    // Route::post('/refresh', 'refresh');
 });
 // Route::post('prueba', function () {
 //     echo 'hola mundo';
