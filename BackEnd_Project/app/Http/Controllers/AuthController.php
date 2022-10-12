@@ -103,11 +103,15 @@ class AuthController extends Controller
 
     public function logout()
     {
-        Auth::logout();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Successfully logged out',
-        ]);
+        try {
+            Auth::logout();
+            return response()->json([
+                'status' => true,
+                'message' => 'Successfully logged out',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 
     public function refresh()
@@ -134,7 +138,6 @@ class AuthController extends Controller
         $datetime = Carbon::now()->format('Y-m-d H:i:s');
         $userId = User::find($user[0]['id']);
         $userId->rememberToken = '';
-        $userId->is_verified = 1;
         $userId->state = 1;
         $userId->email_verified_at = $datetime;
         $userId->save();

@@ -21,6 +21,6 @@ use App\Http\Controllers\AuthController;
 Route::group(['middleware' => 'api'], function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', 'logout');
-    Route::post('/refresh', 'refresh');
+    Route::get('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
 });
