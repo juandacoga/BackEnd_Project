@@ -24,12 +24,12 @@ class User extends Authenticatable implements JWTSubject
     protected $collection = 'user__manager';
     protected $fillable = [
         'name',
+        'type_user',
         'email',
         'password',
-        'type_user',
         'state',
         'first_login',
-        'confirm_email',
+
     ];
 
     /**
